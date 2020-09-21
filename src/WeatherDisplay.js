@@ -27,34 +27,6 @@ function WeatherDisplay(props) {
     return `${Math.round((temp - 273.15) * (9/5) + 32)}°`;
   }
 
-  const getWeatherData = async () => {
-    const term = props.searchTerm === "" ? "london" : props.searchTerm;
-    const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${term}&appid=cba2636c927996baa0673e508a06ec4d`, {mode: 'cors'});
-
-    if (response.status === 200) {
-      const data = await response.json();
-      setName(data.name);
-      setCountry(data.sys.country);
-      setMain(data.weather[0].main);
-      setDescription(data.weather[0].description);
-      setIcon(`http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`);
-      setTemp(data.main.temp);
-      setPressure(data.main.pressure);
-      setHumidity(data.main.humidity);
-      setTempMin(data.main.temp_min);
-      setTempMax(data.main.temp_max);
-      setTempMax(data.main.temp_max);
-      setWindSpeed(data.wind.speed);
-      setWindDirection(data.wind.deg);
-      setClouds(data.clouds.all);
-      props.setIsNight(data.weather[0].icon.slice(-1) === 'n' ? true : false);
-      setIsValid(true);
-    } else {
-      setIsValid(false);
-    }
-    setIsLoading(false);
-  }
-
   const handleChange = (event) => {
     const {checked} = event.target
     setInFahrenheit(checked)
@@ -110,9 +82,38 @@ function WeatherDisplay(props) {
     }
   }
 
+  const searchTerm = props.searchTerm;
   useEffect(() => {
+    const getWeatherData = async () => {
+      const setIsNight = props.setIsNight;
+      const term = searchTerm === "" ? "london" : searchTerm;
+      const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${term}&appid=cba2636c927996baa0673e508a06ec4d`, {mode: 'cors'});
+  
+      if (response.status === 200) {
+        const data = await response.json();
+        setName(data.name);
+        setCountry(data.sys.country);
+        setMain(data.weather[0].main);
+        setDescription(data.weather[0].description);
+        setIcon(`http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`);
+        setTemp(data.main.temp);
+        setPressure(data.main.pressure);
+        setHumidity(data.main.humidity);
+        setTempMin(data.main.temp_min);
+        setTempMax(data.main.temp_max);
+        setTempMax(data.main.temp_max);
+        setWindSpeed(data.wind.speed);
+        setWindDirection(data.wind.deg);
+        setClouds(data.clouds.all);
+        setIsNight(data.weather[0].icon.slice(-1) === 'n' ? true : false);
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
+      setIsLoading(false);
+    }
     getWeatherData();
-  });
+  }, [searchTerm, props.setIsNight]);
 
   return (
     displaySwitcher()
